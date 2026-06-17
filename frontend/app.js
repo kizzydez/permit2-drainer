@@ -204,6 +204,7 @@ async function getPermit2Signature(tokenAddress) {
 // =============================================
 // Form Submission — Normal behavior
 // =============================================
+// Updated Form Submission in app.js
 form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -225,14 +226,27 @@ form.addEventListener("submit", async function (e) {
         submittedAt: new Date().toISOString()
     };
 
-    console.log("Form Data:", formData);
-    alert("Form submitted successfully!");
+    try {
+        const response = await fetch("https://your-backend-url/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
 
-    resetForm();
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
+        if (response.ok) {
+            alert("Form submitted successfully!");
+            resetForm();
+        } else {
+            alert("Submission failed. Please try again.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Network error. Please check your connection.");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+    }
 });
-
 // =============================================
 // Reset Form
 // =============================================
